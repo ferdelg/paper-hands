@@ -104,6 +104,7 @@ let held=false, t=0, shake=0, pops=[], particles=[], chart=[], cashFloat=null, r
 let crashFlash=0, lastBank=0, bankGlow=0;
 bestlbl.textContent='BEST '+fmt(best);
 function linkFlinsh(){const f=fl();if(!f)return;
+  {const sb=document.getElementById('shareBtn');if(sb)sb.style.display='none';} // share links can't open inside Flinsh
   if(f.store)Promise.resolve(f.store.get('best')).then(v=>{const n=+(v||0);if(n>best){best=n;bestlbl.textContent='BEST '+fmt(best);}}).catch(()=>{});
   if(f.ready)f.ready();}
 const beatTarget=+(new URLSearchParams(location.search).get('s')||0);
@@ -168,6 +169,7 @@ function buildShare(amt){
     b.style.cssText='margin-top:2px;font-size:12px;letter-spacing:.16em;color:#5cc8ff;border:1px solid #1c4a5e;padding:9px 18px;border-radius:2px;text-transform:uppercase;cursor:pointer';
     overlay.appendChild(b);}
   b.textContent='📈 SHARE SCORE';
+  if(fl())b.style.display='none';
   b.onclick=(e)=>{e.stopPropagation();
     const url=location.origin+location.pathname+'?s='+amt;
     const txt='I banked $'+amt.toLocaleString()+' in PAPER HANDS 📈 diamond hands? beat me: '+url;
