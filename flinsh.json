@@ -1,0 +1,8 @@
+{
+  "flinsh": "2",
+  "name": "Paper Hands",
+  "description": "Hold for more, lose it all. A one-button greed game; your best score is saved.",
+  "type": "app",
+  "entrypoint": "index.html",
+  "permissions": ["store:user"]
+}

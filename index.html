@@ -61,11 +61,14 @@
       and the more likely it all <b>rugs</b>. <b>Release</b> to bank it. One rug ends the run.</div>
     <div id="cta">TAP &amp; HOLD TO PUMP</div>
   </div>
-  <div id="foot">a money_maker arcade · <a href="/paper-hands/sell-the-top/" style="color:#2c3a33;text-decoration:none;border-bottom:1px dotted #223">SELL THE TOP</a> · <a href="/paper-hands/rug-dodger/" style="color:#2c3a33;text-decoration:none;border-bottom:1px dotted #223">RUG DODGER</a> · <a href="/paper-hands/bag-run/" style="color:#2c3a33;text-decoration:none;border-bottom:1px dotted #223">BAG RUN</a></div>
+  <div id="foot">a money_maker arcade</div>
 </div></div>
 <script>
-(()=>{
 "use strict";
+let booted=false;
+function boot(){
+if(booted)return;booted=true;
+const fl=()=>window.flinsh||null;
 const cv=document.getElementById('c'),ctx=cv.getContext('2d');
 const stage=document.getElementById('stage');
 const overlay=document.getElementById('overlay'),titleEl=document.getElementById('title');
@@ -96,10 +99,13 @@ function noise(dur=.45,vol=.4){const a=ac();if(!a)return;
 // ---- state ----
 const S={menu:0,pump:1,cashpop:2,over:3};
 let state=S.menu;
-let mult=1, score=0, best=+(localStorage.getItem('ph_best')||0);
+let mult=1, score=0, best=0;
 let held=false, t=0, shake=0, pops=[], particles=[], chart=[], cashFloat=null, rng=Math.random;
 let crashFlash=0, lastBank=0, bankGlow=0;
 bestlbl.textContent='BEST '+fmt(best);
+function linkFlinsh(){const f=fl();if(!f)return;
+  if(f.store)Promise.resolve(f.store.get('best')).then(v=>{const n=+(v||0);if(n>best){best=n;bestlbl.textContent='BEST '+fmt(best);}}).catch(()=>{});
+  if(f.ready)f.ready();}
 const beatTarget=+(new URLSearchParams(location.search).get('s')||0);
 if(beatTarget>0){tagEl.innerHTML+='<br><span style="color:#5cc8ff">📈 a friend banked $'+beatTarget.toLocaleString()+' — beat them.</span>';}
 
@@ -113,7 +119,7 @@ function start(){
 function gameOver(){
   state=S.over;shake=26;crashFlash=1;noise(.5,.5);tone(120,.5,'sawtooth',.25);
   for(let i=0;i<60;i++)particles.push({x:px(),y:py(),vx:(rng()-.5)*9,vy:(rng()-.5)*9-2,life:1,c:'#ff4d6d'});
-  if(score>best){best=Math.floor(score);localStorage.setItem('ph_best',best);}
+  if(score>best){best=Math.floor(score);{const f=fl();if(f&&f.store)Promise.resolve(f.store.set('best',best)).catch(()=>{});}}
   bestlbl.textContent='BEST '+fmt(best);
   showOver();
 }
@@ -246,7 +252,9 @@ function draw(){
 }
 
 resize();requestAnimationFrame(frame);
-})();
+if(fl())linkFlinsh();else addEventListener('flinsh:ready',linkFlinsh,{once:true});
+}
+if(window.flinsh)boot();else{addEventListener('flinsh:ready',boot,{once:true});setTimeout(boot,400);} // standalone fallback: no bridge in a plain browser
 </script>
 </body>
 </html>
